@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="root">
+  <module name="single_blank_line_at_eof" />
+  <module name="constant_case" />
+  <module name="ordered_imports">
+    <property name="sort_algorithm" value="length" />
+  </module>
+</module>

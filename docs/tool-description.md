@@ -1,0 +1,1 @@
+PHP-CS-Fixer is a tool that automatically fixes PHP coding standards issues, including PSR-1, PSR-2, PSR-12, Symfony and many other coding style rules. [Learn more](https://github.com/PHP-CS-Fixer/PHP-CS-Fixer)
