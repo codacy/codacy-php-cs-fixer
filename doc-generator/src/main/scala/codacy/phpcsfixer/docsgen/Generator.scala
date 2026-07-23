@@ -121,9 +121,15 @@ class Generator {
     fixer.configuration.flatMap(option => scalarDefaultAsString(option).map(option -> _))
   }
 
+  // Parameter.Value's string constructor sniffs its input as JSON before falling back to a literal
+  // string, so an unquoted string default that happens to look like a number/bool/null (e.g. the "10.0"
+  // PHPUnit target-version default) gets silently reinterpreted as that other JSON type - which then
+  // fails php-cs-fixer's own type validation once sent back through --rules. Re-quoting string defaults
+  // here forces them to keep parsing back as JsString. Boolean/number defaults are left unquoted so they
+  // *do* round-trip as their real type, which options with a genuine bool/int default expect.
   private[this] def scalarDefaultAsString(option: FixerOption): Option[String] = {
     option.default match {
-      case Some(JsString(str)) => Some(str)
+      case Some(value @ JsString(_)) => Some(Json.stringify(value))
       case Some(value @ (_: JsBoolean | _: JsNumber)) => Some(Json.stringify(value))
       case _ => None
     }

@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<checkstyle version="4.3">
+  <file name="Extra.php">
+    <error source="array_syntax" line="3" message="PHP arrays should be declared using the configured syntax." severity="info"/>
+    <error source="blank_line_after_opening_tag" line="3" message="Ensure there is no code on the same line as the PHP open tag and it is followed by a blank line." severity="info"/>
+    <error source="blank_line_before_statement" line="3" message="An empty line feed must precede any configured statement." severity="info"/>
+    <error source="concat_space" line="3" message="Concatenation should be spaced according to configuration." severity="info"/>
+    <error source="declare_strict_types" line="3" message="Force a strict types mode in all files." severity="warning"/>
+    <error source="is_null" line="3" message="Replaces `is_null($var)` expression with `null === $var`." severity="warning"/>
+    <error source="logical_operators" line="3" message="Use `&amp;&amp;` and `||` logical operators instead of `and` and `or`." severity="warning"/>
+    <error source="native_function_invocation" line="3" message="Add leading `\` before function invocation to speed up resolving." severity="warning"/>
+    <error source="no_alias_functions" line="3" message="Master functions shall be used instead of aliases." severity="warning"/>
+    <error source="no_useless_concat_operator" line="3" message="There should not be useless concat operations." severity="info"/>
+    <error source="strict_comparison" line="3" message="Comparisons should be strict." severity="warning"/>
+    <error source="ternary_operator_spaces" line="3" message="Standardize spaces around ternary operator." severity="info"/>
+    <error source="ternary_to_elvis_operator" line="3" message="Use the Elvis operator `?:` where possible." severity="warning"/>
+    <error source="yoda_style" line="3" message="Write conditions in Yoda style (`true`), non-Yoda style (`['equal' =&gt; false, 'identical' =&gt; false, 'less_and_greater' =&gt; false]`) or ignore those conditions (`null`) based on configuration." severity="info"/>
+  </file>
+  <file name="Modern.php">
+    <error source="binary_operator_spaces" line="3" message="Binary operators should be surrounded by space as configured." severity="info"/>
+    <error source="blank_line_after_opening_tag" line="3" message="Ensure there is no code on the same line as the PHP open tag and it is followed by a blank line." severity="info"/>
+    <error source="blank_line_before_statement" line="3" message="An empty line feed must precede any configured statement." severity="info"/>
+    <error source="braces_position" line="3" message="Braces must be placed as configured." severity="info"/>
+    <error source="declare_strict_types" line="3" message="Force a strict types mode in all files." severity="warning"/>
+    <error source="function_declaration" line="3" message="Spaces should be properly placed in a function declaration." severity="info"/>
+    <error source="no_unneeded_control_parentheses" line="3" message="Removes unneeded parentheses around control statements." severity="info"/>
+    <error source="single_space_around_construct" line="3" message="Ensures a single space after language constructs." severity="info"/>
+    <error source="static_lambda" line="3" message="Lambdas not (indirectly) referencing `$this` must be declared `static`." severity="warning"/>
+  </file>
+  <file name="Sample.php">
+    <error source="array_syntax" line="3" message="PHP arrays should be declared using the configured syntax." severity="info"/>
+    <error source="binary_operator_spaces" line="3" message="Binary operators should be surrounded by space as configured." severity="info"/>
+    <error source="blank_line_after_opening_tag" line="3" message="Ensure there is no code on the same line as the PHP open tag and it is followed by a blank line." severity="info"/>
+    <error source="braces_position" line="3" message="Braces must be placed as configured." severity="info"/>
+    <error source="cast_spaces" line="3" message="A single space or none should be between cast and variable." severity="info"/>
+    <error source="class_attributes_separation" line="3" message="Class, trait and interface elements must be separated with one or none blank line." severity="info"/>
+    <error source="constant_case" line="3" message="The PHP constants `true`, `false`, and `null` MUST be written using the correct casing." severity="info"/>
+    <error source="control_structure_continuation_position" line="3" message="Control structure continuation keyword must be on the configured line." severity="info"/>
+    <error source="declare_strict_types" line="3" message="Force a strict types mode in all files." severity="warning"/>
+    <error source="fully_qualified_strict_types" line="3" message="Removes the leading part of fully qualified symbol references if a given symbol is imported or belongs to the current namespace." severity="info"/>
+    <error source="increment_style" line="3" message="Pre- or post-increment and decrement operators should be used if possible." severity="info"/>
+    <error source="lowercase_cast" line="3" message="Cast should be written in lower case." severity="info"/>
+    <error source="method_argument_space" line="3" message="In method arguments and method call, there MUST NOT be a space before each comma and there MUST be one space after each comma. Argument lists MAY be split across multiple lines, where each subsequent line is indented once. When doing so, the first item in the list MUST be on the next line, and there MUST be only one argument per line." severity="info"/>
+    <error source="modifier_keywords" line="3" message="Classes, constants, properties, and methods MUST have visibility declared, and keyword modifiers MUST be in the following order: inheritance modifier (`abstract` or `final`), visibility modifier (`public`, `protected`, or `private`), set-visibility modifier (`public(set)`, `protected(set)`, or `private(set)`), scope modifier (`static`), mutation modifier (`readonly`), type declaration, name." severity="info"/>
+    <error source="native_function_invocation" line="3" message="Add leading `\` before function invocation to speed up resolving." severity="warning"/>
+    <error source="no_empty_phpdoc" line="3" message="There should not be empty PHPDoc blocks." severity="info"/>
+    <error source="no_extra_blank_lines" line="3" message="Removes extra blank lines and/or blank lines following configuration." severity="info"/>
+    <error source="no_mixed_echo_print" line="3" message="Either language construct `print` or `echo` should be used." severity="info"/>
+    <error source="no_superfluous_phpdoc_tags" line="3" message="Removes `@param`, `@return` and `@var` tags that don't provide any useful information." severity="info"/>
+    <error source="no_trailing_comma_in_singleline" line="3" message="If a list of values separated by a comma is contained on a single line, then the last item MUST NOT have a trailing comma." severity="info"/>
+    <error source="no_unneeded_control_parentheses" line="3" message="Removes unneeded parentheses around control statements." severity="info"/>
+    <error source="no_unused_imports" line="3" message="Unused `use` statements must be removed." severity="info"/>
+    <error source="no_useless_return" line="3" message="There should not be an empty `return` statement at the end of a function." severity="info"/>
+    <error source="no_whitespace_in_blank_line" line="3" message="Remove trailing whitespace at the end of blank lines." severity="info"/>
+    <error source="phpdoc_no_empty_return" line="3" message="`@return void` and `@return null` annotations must be removed from PHPDoc." severity="info"/>
+    <error source="psr_autoloading" line="3" message="Classes must be in a path that matches their namespace, be at least one namespace deep and the class name should match the file name." severity="warning"/>
+    <error source="short_scalar_cast" line="3" message="Cast `(boolean)` and `(integer)` should be written as `(bool)` and `(int)`, `(double)` and `(real)` as `(float)`, `(binary)` as `(string)`." severity="info"/>
+    <error source="single_quote" line="3" message="Convert double quotes to single quotes for simple strings." severity="info"/>
+    <error source="single_space_around_construct" line="3" message="Ensures a single space after language constructs." severity="info"/>
+    <error source="space_after_semicolon" line="3" message="Fix whitespace after a semicolon." severity="info"/>
+    <error source="spaces_inside_parentheses" line="3" message="Parentheses must be declared using the configured whitespace." severity="info"/>
+    <error source="strict_comparison" line="3" message="Comparisons should be strict." severity="warning"/>
+    <error source="void_return" line="3" message="Add `void` return type to functions with missing or empty return statements, but priority is given to `@return` annotations." severity="warning"/>
+    <error source="whitespace_after_comma_in_array" line="3" message="In array declaration, there MUST be a whitespace after each comma." severity="info"/>
+  </file>
+</checkstyle>
