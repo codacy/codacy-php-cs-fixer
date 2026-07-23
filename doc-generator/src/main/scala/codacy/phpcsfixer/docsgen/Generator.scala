@@ -2,7 +2,7 @@ package codacy.phpcsfixer.docsgen
 
 import better.files.File
 import com.codacy.plugins.api.results.{Parameter, Pattern, Result, Tool}
-import play.api.libs.json.{JsString, JsValue, Json, Reads, Writes}
+import play.api.libs.json.{JsBoolean, JsNumber, JsString, JsValue, Json, Reads, Writes}
 
 import scala.util.Properties
 
@@ -74,8 +74,8 @@ class Generator {
 
   private[this] def toSpecification(fixer: FixerDoc, psr12Rules: Set[String]): Pattern.Specification = {
     val level = if (fixer.isRisky) Result.Level.Warn else Result.Level.Info
-    val parameters = fixer.configuration.view.map { option =>
-      Parameter.Specification(Parameter.Name(option.name), Parameter.Value(defaultValueAsString(option)))
+    val parameters = configurableOptions(fixer).view.map { case (option, default) =>
+      Parameter.Specification(Parameter.Name(option.name), Parameter.Value(default))
     }.toSet
 
     Pattern.Specification(patternId = Pattern.Id(fixer.name),
@@ -88,29 +88,44 @@ class Generator {
   }
 
   private[this] def toDescription(fixer: FixerDoc): Pattern.Description = {
-    val parameters = fixer.configuration.view.map { option =>
+    val parameters = configurableOptions(fixer).view.map { case (option, _) =>
       Parameter.Description(Parameter.Name(option.name), Parameter.DescriptionText(option.description))
     }.toSet
 
     Pattern.Description(patternId = Pattern.Id(fixer.name),
-                        title = Pattern.Title(fixer.summary),
+                        title = Pattern.Title(truncateTitle(fixer.summary)),
                         description = Some(Pattern.DescriptionText(fixer.summary)),
                         timeToFix = None,
                         parameters = parameters
     )
   }
 
-  private[this] def defaultValueAsString(option: FixerOption): String = {
-    option.default match {
-      case Some(value) => jsValueAsSimpleString(value)
-      case None => ""
-    }
+  // Most fixers' getSummary() is a short one-liner, but a few (e.g. modifier_keywords,
+  // visibility_required) return a full paragraph - Codacy caps pattern titles at 255 characters.
+  private[this] val maxTitleLength = 255
+
+  private[this] def truncateTitle(summary: String): String = {
+    if (summary.length <= maxTitleLength) summary
+    else summary.take(maxTitleLength - 1).trim + "…"
   }
 
-  private[this] def jsValueAsSimpleString(value: JsValue): String = {
-    value match {
-      case JsString(str) => str
-      case other => Json.stringify(other)
+  // Codacy's Parameter.Value model only round-trips simple scalars: withDefaultParameters plucks a
+  // parameter's stored default straight out of patterns.json and hands it to us unchanged as-is (no
+  // re-parsing), so whatever we store here is exactly what gets sent back to php-cs-fixer's --rules for
+  // any parameter Codacy's config doesn't explicitly set. Options whose real PHP default is an array or
+  // null (e.g. ordered_imports' `imports_order`) can't be represented as a Parameter.Value string without
+  // producing an invalid value (php-cs-fixer expects `string[]|null`, not the literal string "" or "null"),
+  // so those are left out of `parameters` entirely - the rule stays fully usable, just not independently
+  // configurable for that one option, and php-cs-fixer's own built-in default silently applies instead.
+  private[this] def configurableOptions(fixer: FixerDoc): List[(FixerOption, String)] = {
+    fixer.configuration.flatMap(option => scalarDefaultAsString(option).map(option -> _))
+  }
+
+  private[this] def scalarDefaultAsString(option: FixerOption): Option[String] = {
+    option.default match {
+      case Some(JsString(str)) => Some(str)
+      case Some(value @ (_: JsBoolean | _: JsNumber)) => Some(Json.stringify(value))
+      case _ => None
     }
   }
 

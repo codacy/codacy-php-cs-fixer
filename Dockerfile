@@ -2,9 +2,16 @@ FROM php:8.5-cli AS fixer-metadata
 
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    unzip \
+    zlib1g \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN curl -sS https://getcomposer.org/installer | php
 
-COPY composer.json .
+COPY composer.json composer.lock ./
 COPY dev-tools dev-tools
 
 RUN php composer.phar install --no-interaction --no-dev --optimize-autoloader
@@ -16,6 +23,7 @@ FROM sbtscala/scala-sbt:eclipse-temurin-alpine-25.0.3_9_1.12.13_3.8.4 AS doc-gen
 WORKDIR /app
 
 COPY build.sbt .
+COPY composer.json .
 COPY docs /docs
 COPY project project
 COPY doc-generator doc-generator
@@ -42,6 +50,14 @@ WORKDIR /app
 ENV COMPOSER_HOME=/app/.composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV PATH=${COMPOSER_HOME}/vendor/bin:${PATH}
+
+# Update package manager and install necessary packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    unzip \
+    zlib1g \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install Composer and packages
 RUN curl -sS https://getcomposer.org/installer | php

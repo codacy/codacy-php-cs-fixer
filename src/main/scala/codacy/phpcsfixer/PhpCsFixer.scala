@@ -106,7 +106,11 @@ object PhpCsFixer extends Tool {
          "--diff",
          "--format=gitlab",
          "--allow-risky=yes",
-         "--using-cache=no"
+         "--using-cache=no",
+         // Without a config file or --rules, php-cs-fixer >= 3.9x drops into an interactive setup wizard
+         // and writes a `.php-cs-fixer.dist.php` into the analyzed directory. --no-interaction makes it
+         // fall back to its built-in default ruleset instead, with no side effects on /src.
+         "--no-interaction"
     ) ++ rulesFlags ++ filesToLint
   }
 
