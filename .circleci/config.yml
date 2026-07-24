@@ -7,7 +7,7 @@ orbs:
 workflows:
   compile_test_deploy:
     jobs:
-      - codacy/checkout_and_version
+      - codacy/checkout_and_version:
           release_branch: main
       - codacy/shell:
           name: publish_docker_local
