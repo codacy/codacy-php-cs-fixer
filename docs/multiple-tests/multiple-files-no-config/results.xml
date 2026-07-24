@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<checkstyle version="4.3">
+  <file name="A.php">
+    <error source="blank_line_after_opening_tag" line="2" message="Ensure there is no code on the same line as the PHP open tag and it is followed by a blank line." severity="info" />
+    <error source="constant_case" line="2" message="The PHP constants `true`, `false`, and `null` MUST be written using the correct casing." severity="info" />
+  </file>
+  <file name="B.php">
+    <error source="blank_line_after_opening_tag" line="2" message="Ensure there is no code on the same line as the PHP open tag and it is followed by a blank line." severity="info" />
+    <error source="constant_case" line="2" message="The PHP constants `true`, `false`, and `null` MUST be written using the correct casing." severity="info" />
+  </file>
+</checkstyle>

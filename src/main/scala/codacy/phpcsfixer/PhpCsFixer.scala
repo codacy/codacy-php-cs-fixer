@@ -116,8 +116,18 @@ object PhpCsFixer extends Tool {
         val rulesJson = JsObject(patterns.map(p => p.patternId.value -> ruleValue(p)))
         List(s"--config=$ignoreConfigFile", s"--rules=${Json.stringify(rulesJson)}")
       case None =>
-        // No file found either: fall through to php-cs-fixer's own built-in default ruleset.
-        configFile.map(path => List(s"--config=$path")).getOrElse(Nil)
+        configFile match {
+          case Some(path) => List(s"--config=$path")
+          case None =>
+            // No repo config file found either. We *must* still pass an explicit --config: if none is
+            // given and more than one path ends up on the command line (Codacy commonly invokes us with
+            // a chunk of individual file paths rather than the whole source directory, per splitChunkSize),
+            // php-cs-fixer's own config resolution refuses to guess a shared directory and throws
+            // "For multiple paths config parameter is required." `--config=-` sidesteps that resolution
+            // entirely and falls through to php-cs-fixer's own built-in default ruleset, same as it would
+            // for a single path.
+            List(s"--config=$ignoreConfigFile")
+        }
     }
 
     List("php-cs-fixer",
