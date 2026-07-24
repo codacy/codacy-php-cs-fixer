@@ -28,7 +28,7 @@ workflows:
           filters:
             branches:
               only:
-                - master
+                - main
       - codacy/tag_version:
           name: tag_version
           context: CodacyAWS
