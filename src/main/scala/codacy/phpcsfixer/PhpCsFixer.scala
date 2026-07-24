@@ -51,7 +51,7 @@ object PhpCsFixer extends Tool {
       // via this same FileHelper) instead of leaning on php-cs-fixer's own auto-discovery, which only
       // ever looks in its current working directory.
       val configFile: Option[Path] =
-        if (fullConfig.isEmpty) FileHelper.findConfigurationFile(Paths.get(source.path), configFilenames) else None
+        if (fullConfig.isEmpty) FileHelper.findConfigurationFile(Paths.get(source.path), configFilenames, maxDepth = 1) else None
 
       val command = getCommandFor(fullConfig, configFile, filesToLint)
 
