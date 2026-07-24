@@ -1,10 +1,11 @@
 package codacy.phpcsfixer
 
 import java.io.File
+import java.nio.file.{Path, Paths}
 
 import com.codacy.plugins.api.{ErrorMessage, Options, Source}
 import com.codacy.plugins.api.results.{Pattern, Result, Tool}
-import com.codacy.tools.scala.seed.utils.CommandRunner
+import com.codacy.tools.scala.seed.utils.{CommandRunner, FileHelper}
 import com.codacy.tools.scala.seed.utils.ToolHelper._
 import play.api.libs.json.{JsArray, JsBoolean, JsObject, JsValue, Json}
 
@@ -15,6 +16,10 @@ object PhpCsFixer extends Tool {
   // php-cs-fixer's documented sentinel value for `--config` that tells it to ignore any
   // `.php-cs-fixer(.dist).php` present in the source directory (ConfigurationResolver::IGNORE_CONFIG_FILE).
   private[this] val ignoreConfigFile = "-"
+
+  // Precedence matches php-cs-fixer's own: .php-cs-fixer.php (meant to be gitignored, for local
+  // overrides) wins over .php-cs-fixer.dist.php when both exist.
+  private[this] val configFilenames = Set(".php-cs-fixer.php", ".php-cs-fixer.dist.php")
 
   // Bitmask exit codes, see src/Console/Command/FixCommandExitStatusCalculator.php.
   // Only set when running `check` (i.e. dry-run):
@@ -41,7 +46,14 @@ object PhpCsFixer extends Tool {
         paths.map(_.toString).toList
       }
 
-      val command = getCommandFor(fullConfig, filesToLint)
+      // No Codacy pattern selection means "use the repository's own configuration" - explicitly look
+      // for it (searching subdirectories too, matching the convention other Codacy tool wrappers use
+      // via this same FileHelper) instead of leaning on php-cs-fixer's own auto-discovery, which only
+      // ever looks in its current working directory.
+      val configFile: Option[Path] =
+        if (fullConfig.isEmpty) FileHelper.findConfigurationFile(Paths.get(source.path), configFilenames) else None
+
+      val command = getCommandFor(fullConfig, configFile, filesToLint)
 
       CommandRunner.exec(command, Option(new File(source.path))) match {
         case Right(resultFromTool) =>
@@ -94,10 +106,18 @@ object PhpCsFixer extends Tool {
     }
   }
 
-  private[this] def getCommandFor(configurationOpt: Option[List[Pattern.Definition]], filesToLint: List[String]): List[String] = {
-    val rulesFlags = configurationOpt.fold(List.empty[String]) { patterns =>
-      val rulesJson = JsObject(patterns.map(p => p.patternId.value -> ruleValue(p)))
-      List(s"--config=$ignoreConfigFile", s"--rules=${Json.stringify(rulesJson)}")
+  private[this] def getCommandFor(configurationOpt: Option[List[Pattern.Definition]],
+                                  configFile: Option[Path],
+                                  filesToLint: List[String]
+  ): List[String] = {
+    val configFlags = configurationOpt match {
+      case Some(patterns) =>
+        // Codacy pattern selection always wins over any config file present in the repo.
+        val rulesJson = JsObject(patterns.map(p => p.patternId.value -> ruleValue(p)))
+        List(s"--config=$ignoreConfigFile", s"--rules=${Json.stringify(rulesJson)}")
+      case None =>
+        // No file found either: fall through to php-cs-fixer's own built-in default ruleset.
+        configFile.map(path => List(s"--config=$path")).getOrElse(Nil)
     }
 
     List("php-cs-fixer",
@@ -111,7 +131,7 @@ object PhpCsFixer extends Tool {
          // and writes a `.php-cs-fixer.dist.php` into the analyzed directory. --no-interaction makes it
          // fall back to its built-in default ruleset instead, with no side effects on /src.
          "--no-interaction"
-    ) ++ rulesFlags ++ filesToLint
+    ) ++ configFlags ++ filesToLint
   }
 
   private[this] def ruleValue(pattern: Pattern.Definition): JsValue = {
