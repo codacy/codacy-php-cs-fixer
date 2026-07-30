@@ -1,6 +1,6 @@
 {
   "require": {
-    "friendsofphp/php-cs-fixer": "3.95.15"
+    "friendsofphp/php-cs-fixer": "3.95.17"
   },
   "config": {
     "allow-plugins": {}
