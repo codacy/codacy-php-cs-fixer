@@ -3,6 +3,7 @@ package codacy.phpcsfixer.docsgen
 import better.files.File
 import com.codacy.plugins.api.results.{Parameter, Pattern, Result, Tool}
 import play.api.libs.json.{JsBoolean, JsNumber, JsString, JsValue, Json, Reads, Writes}
+import com.codacy.plugins.api.languages.Languages
 
 import scala.util.Properties
 
@@ -80,8 +81,9 @@ class Generator {
 
     Pattern.Specification(patternId = Pattern.Id(fixer.name),
                           level = level,
-                          category = Pattern.Category.CodeStyle,
+                          category = RuleCategories.byPatternId.getOrElse(fixer.name, Pattern.Category.CodeStyle),
                           subcategory = None,
+                          languages = Set(Languages.PHP),
                           parameters = parameters,
                           enabled = psr12Rules.contains(fixer.name) && !fixer.isDeprecated
     )
