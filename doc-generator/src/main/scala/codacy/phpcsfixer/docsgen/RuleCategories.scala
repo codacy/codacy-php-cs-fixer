@@ -61,7 +61,7 @@ object RuleCategories {
     "no_useless_else" -> Pattern.Category.Complexity,
     "no_useless_return" -> Pattern.Category.Complexity,
 
-    // Documentation - phpdoc_* handled via prefix check below, plus a few stragglers
+    // Documentation
     "header_comment" -> Pattern.Category.Documentation,
     "comment_to_phpdoc" -> Pattern.Category.Documentation,
     "general_phpdoc_annotation_remove" -> Pattern.Category.Documentation,
