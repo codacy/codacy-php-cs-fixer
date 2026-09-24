@@ -18,7 +18,7 @@ RUN php composer.phar install --no-interaction --no-dev --optimize-autoloader
 
 RUN php dev-tools/dump-fixers.php > fixers-dump.json
 
-FROM sbtscala/scala-sbt:eclipse-temurin-alpine-25.0.3_9_1.12.13_3.8.4 AS doc-generator
+FROM sbtscala/scala-sbt:eclipse-temurin-alpine-25.0.4_7_1.13.0_3.8.4 AS doc-generator
 
 WORKDIR /app
 
