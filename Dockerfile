@@ -50,6 +50,7 @@ WORKDIR /app
 ENV COMPOSER_HOME=/app/.composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV PATH=${COMPOSER_HOME}/vendor/bin:${PATH}
+ENV GPG_KEYS=""
 
 # Update package manager and install necessary packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
