@@ -42,8 +42,14 @@ object PhpCsFixer extends Tool {
   )(implicit specification: Tool.Specification): Try[List[Result]] = {
     Try {
       val fullConfig = configuration.withDefaultParameters
+      val phpCsFixerConfigFiles = Set(
+        ".php-cs-fixer.php",
+        ".php-cs-fixer.dist.php"
+      )
       val filesToLint: List[String] = files.fold(List(source.toString)) { paths =>
-        paths.map(_.toString).toList
+        paths.toList
+        .filterNot(f => phpCsFixerConfigFiles.contains(Paths.get(f.path).getFileName.toString))
+        .map(_.toString)
       }
 
       // No Codacy pattern selection means "use the repository's own configuration" - explicitly look
@@ -68,12 +74,25 @@ object PhpCsFixer extends Tool {
     if (exitCode == 0) {
       Nil
     } else if ((exitCode & hardFailureBits) != 0) {
+      // Currently php-cs-fixer's error output is a mix of fixed warning and 
+      // specific error message, so if we can find where that fixed warning starts, 
+      // we can just show the error message and not the fixed warning.
+      // if not, we just show the first 150 characters of the error message.
+      // https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/blob/4a935fc9fbccafe291deea088f41204eb2290cb0/src/Console/WarningsDetector.php#L114
+      val helpMarker = "If you need help while solving warnings"
+
+      val fullStderr = stderr.mkString(Properties.lineSeparator)
+      val relevantStderr = fullStderr.indexOf(helpMarker) match {
+        case -1  => fullStderr.take(150) // marker missing: fall back to a safe cap
+        case idx => fullStderr.substring(0, idx).trim
+      }
+
       val msg =
         s"""
-           |php-cs-fixer exited with code $exitCode
-           |stdout: ${stdout.mkString(Properties.lineSeparator)}
-           |stderr: ${stderr.mkString(Properties.lineSeparator)}
-            """.stripMargin
+          |PHP CS Fixer exited with code $exitCode
+          |stdout: ${stdout.mkString(Properties.lineSeparator)}
+          |stderr: $relevantStderr
+          |""".stripMargin
       throw new Exception(msg)
     } else {
       val issues =
