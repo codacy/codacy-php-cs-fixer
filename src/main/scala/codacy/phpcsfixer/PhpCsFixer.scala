@@ -42,14 +42,8 @@ object PhpCsFixer extends Tool {
   )(implicit specification: Tool.Specification): Try[List[Result]] = {
     Try {
       val fullConfig = configuration.withDefaultParameters
-      val phpCsFixerConfigFiles = Set(
-        ".php-cs-fixer.php",
-        ".php-cs-fixer.dist.php"
-      )
       val filesToLint: List[String] = files.fold(List(source.toString)) { paths =>
-        paths.toList
-        .filterNot(f => phpCsFixerConfigFiles.contains(Paths.get(f.path).getFileName.toString))
-        .map(_.toString)
+        paths.map(_.toString).toList
       }
 
       // No Codacy pattern selection means "use the repository's own configuration" - explicitly look
