@@ -1,7 +1,8 @@
 package codacy.phpcsfixer
 
 import java.io.File
-import java.nio.file.{Path, Paths}
+import java.nio.charset.StandardCharsets
+import java.nio.file.{Path, Paths, Files}
 
 import com.codacy.plugins.api.{ErrorMessage, Options, Source}
 import com.codacy.plugins.api.results.{Pattern, Result, Tool}
@@ -125,9 +126,21 @@ object PhpCsFixer extends Tool {
   ): List[String] = {
     val configFlags = configurationOpt match {
       case Some(patterns) =>
-        // Codacy pattern selection always wins over any config file present in the repo.
-        val rulesJson = JsObject(patterns.map(p => p.patternId.value -> ruleValue(p)))
-        List(s"--config=$ignoreConfigFile", s"--rules=${Json.stringify(rulesJson)}")
+        // Create a JSON string of the rules
+        val rulesJson = Json.stringify(JsObject(patterns.map(p => p.patternId.value -> ruleValue(p))))
+        // Generate a temporary PHP-CS-Fixer config file dynamically
+        val tmpConfigFile = File.createTempFile("codacy-php-cs-fixer-", ".php")
+        tmpConfigFile.deleteOnExit()
+        val configPhp = s"""<?php
+          |return (new PhpCsFixer\\Config())
+          |    ->setRules(json_decode('$rulesJson', true))
+          |    ->setRiskyAllowed(true)
+          |    ->setUsingCache(false);
+          |""".stripMargin
+        Files.write(tmpConfigFile.toPath, configPhp.getBytes(StandardCharsets.UTF_8))
+        // Point the tool exactly to our dynamically generated config file
+        List(s"--config=${tmpConfigFile.getAbsolutePath}")
+
       case None =>
         configFile match {
           case Some(path) => List(s"--config=$path")
