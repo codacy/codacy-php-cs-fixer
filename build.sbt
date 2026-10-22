@@ -12,7 +12,9 @@ lazy val root = project
   .in(file("."))
   .settings(name := "codacy-php-cs-fixer",
             libraryDependencies ++= Seq("com.codacy" %% "codacy-engine-scala-seed" % "6.1.4"),
-            mainClass in Compile := Some("codacy.Engine"),
+            Compile / mainClass := Some("codacy.Engine"),
+            nativeImageInstalled := true,
+            nativeImageGraalHome := file(sys.env("JAVA_HOME")).toPath,
             nativeImageOptions ++= List("-O1",
                                         "-H:+ReportExceptionStackTraces",
                                         "--no-fallback",
