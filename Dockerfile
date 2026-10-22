@@ -31,7 +31,13 @@ COPY --from=fixer-metadata /app/fixers-dump.json /app/fixers-dump.json
 
 RUN sbt 'doc-generator/runMain codacy.phpcsfixer.docsgen.GeneratorMain'
 
-FROM sbtscala/scala-sbt:graalvm-ce-ol9-java17-22.3.3-b1_1.12.11_3.8.4 AS builder
+FROM ghcr.io/graalvm/native-image-community:17-ol9 AS builder
+
+# Reuse sbt from the sbt image
+COPY --from=sbtscala/scala-sbt:graalvm-ce-ol9-java17-22.3.3-b1_1.12.11_3.8.4 /usr/share/sbt /usr/share/sbt
+RUN ln -s /usr/share/sbt/bin/sbt /usr/local/bin/sbt
+
+ENV GRAALVM_HOME=${JAVA_HOME}
 
 WORKDIR /app
 
