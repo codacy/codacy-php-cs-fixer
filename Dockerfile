@@ -18,7 +18,7 @@ RUN php composer.phar install --no-interaction --no-dev --optimize-autoloader
 
 RUN php dev-tools/dump-fixers.php > fixers-dump.json
 
-FROM sbtscala/scala-sbt:eclipse-temurin-17.0.20.1_1_1.13.0_2.13.18 AS doc-generator
+FROM sbtscala/scala-sbt:eclipse-temurin-alpine-25.0.4_7_1.13.0_3.8.4 AS doc-generator
 
 WORKDIR /app
 
@@ -31,16 +31,16 @@ COPY --from=fixer-metadata /app/fixers-dump.json /app/fixers-dump.json
 
 RUN sbt 'doc-generator/runMain codacy.phpcsfixer.docsgen.GeneratorMain'
 
-FROM ghcr.io/graalvm/native-image-community:17-ol9 AS builder
+FROM sbtscala/scala-sbt:graalvm-ce-22.3.3-b1-java17_1.12.11_3.8.4 AS builder
 
-# Reuse sbt from the sbt image
-COPY --from=sbtscala/scala-sbt:graalvm-ce-ol9-java17-22.3.3-b1_1.12.11_3.8.4 /usr/share/sbt /usr/share/sbt
-RUN ln -s /usr/share/sbt/bin/sbt /usr/local/bin/sbt
-
-ENV GRAALVM_HOME=${JAVA_HOME}
+ARG TARGETARCH
+RUN ARCH=$([ "$TARGETARCH" = "arm64" ] && echo aarch64 || echo amd64) && \
+    curl -fsSL -o /tmp/native-image.jar \
+      "https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-22.3.3/native-image-installable-svm-java17-linux-${ARCH}-22.3.3.jar" && \
+    gu install -L /tmp/native-image.jar && \
+    rm /tmp/native-image.jar
 
 WORKDIR /app
-
 COPY build.sbt .
 COPY project project
 COPY src src
