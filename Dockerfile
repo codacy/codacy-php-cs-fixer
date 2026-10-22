@@ -18,7 +18,7 @@ RUN php composer.phar install --no-interaction --no-dev --optimize-autoloader
 
 RUN php dev-tools/dump-fixers.php > fixers-dump.json
 
-FROM sbtscala/scala-sbt:eclipse-temurin-alpine-25.0.4_7_1.13.0_3.8.4 AS doc-generator
+FROM sbtscala/scala-sbt:eclipse-temurin-17.0.20.1_1_1.13.0_2.13.18 AS doc-generator
 
 WORKDIR /app
 
@@ -31,7 +31,7 @@ COPY --from=fixer-metadata /app/fixers-dump.json /app/fixers-dump.json
 
 RUN sbt 'doc-generator/runMain codacy.phpcsfixer.docsgen.GeneratorMain'
 
-FROM sbtscala/scala-sbt:graalvm-ce-22.3.3-b1-java17_1.12.11_3.8.4 AS builder
+FROM sbtscala/scala-sbt:graalvm-ce-ol9-java17-22.3.3-b1_1.12.11_3.8.4 AS builder
 
 WORKDIR /app
 
